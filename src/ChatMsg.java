@@ -1,10 +1,11 @@
+
 // ChatMsg.java 채팅 메시지 ObjectStream 용.
 public class ChatMsg {
-	public String code; // 100:로그인, 400:로그아웃, 200:채팅메시지, 300:Image, 500: Mouse Event
-    public String UserName;
+    public String code;
+    public String userName;
     public String data;
     public byte[] imgbytes;
-    
+
     public String roomName; // 방이름
     public String roomNumofPeo; // 인원수
 
@@ -17,9 +18,41 @@ public class ChatMsg {
 
     public ChatMsg() {}
 
-    public ChatMsg(String UserName, String code, String msg) {
+    public ChatMsg(String userName, String code, String msg) {
         this.code = code;
-        this.UserName = UserName;
+        this.userName = userName;
         this.data = msg;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public String getRoomNumofPeo() {
+        return roomNumofPeo;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
+    public void setRoomNumofPeo(String roomNumofPeo) {
+        this.roomNumofPeo = roomNumofPeo;
     }
 }

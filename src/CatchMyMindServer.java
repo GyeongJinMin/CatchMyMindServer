@@ -138,7 +138,7 @@ public class CatchMyMindServer extends JFrame {
 	public void AppendObject(ChatMsg msg) {
 		// textArea.append("사용자로부터 들어온 object : " + str+"\n");
 		textArea.append("code = " + msg.code + "\n");
-		textArea.append("id = " + msg.UserName + "\n");
+		textArea.append("id = " + msg.userName + "\n");
 		textArea.append("data = " + msg.data + "\n");
 		textArea.setCaretPosition(textArea.getText().length());
 	}
@@ -182,14 +182,14 @@ public class CatchMyMindServer extends JFrame {
 		}
 
 		public void Logout() {
-			String msg = "[" + UserName + "]님이 퇴장 하였습니다.\n";
 			UserVec.removeElement(this); // Logout한 현재 객체를 벡터에서 지운다
-			WriteAll(msg); // 나를 제외한 다른 User들에게 전송
+			WriteOne("logout success"); // 나를 제외한 다른 User들에게 전송
 			this.client_socket = null;
 			AppendText("사용자 " + "[" + UserName + "] 퇴장. 현재 참가자 수 " + UserVec.size());
 		}
 		
 		public void CreateRoom(String roomName, String roomNumofPeo, int roomId) {
+			System.out.println("야");
 			AppendText("[" + UserName + "]님이 방을 생성하였습니다.\n");
 			String msg = "CreateRoom";
 			Room room = new Room(roomName, roomNumofPeo, Integer.toString(roomId));
@@ -248,9 +248,14 @@ public class CatchMyMindServer extends JFrame {
 				WriteChatMsg(obcm);
 			}
 			else if(msg.equals("CreateRoom")) {
+				System.out.println(msg);
 				ChatMsg obcm = new ChatMsg();
 				obcm.code = "300";
 				obcm.roomId = Integer.toString(roomId);
+				WriteChatMsg(obcm);
+			}
+			else if(msg.equals("logout success")) {
+				ChatMsg obcm = new ChatMsg("SERVER", "400", msg);
 				WriteChatMsg(obcm);
 			}
 			else {
@@ -268,12 +273,13 @@ public class CatchMyMindServer extends JFrame {
 		public void WriteChatMsg(ChatMsg obj) {
 			try {
 				if(obj.code.equals("300")) {
+					System.out.println(obj.code);
 					oos.writeObject(obj.code);
 					oos.writeObject(obj.roomId);
 				}
 				else {
 					oos.writeObject(obj.code);
-				    oos.writeObject(obj.UserName);
+				    oos.writeObject(obj.userName);
 				    oos.writeObject(obj.data);
 				    if (obj.code.equals("300")) {
 					    oos.writeObject(obj.imgbytes);
@@ -307,10 +313,10 @@ public class CatchMyMindServer extends JFrame {
 			try {
 				obj = ois.readObject();
 				cm.code = (String) obj;
-				
+				AppendText("code: "+ cm.code);
 				if(cm.code.equals("300")) {
 					obj = ois.readObject();
-					cm.UserName = (String) obj;
+					cm.userName = (String) obj;
 					obj = ois.readObject();
 					cm.roomName = (String) obj;
 					obj = ois.readObject();
@@ -318,7 +324,7 @@ public class CatchMyMindServer extends JFrame {
 				}
 				else {
 					obj = ois.readObject();
-					cm.UserName = (String) obj;
+					cm.userName = (String) obj;
 					obj = ois.readObject();
 					cm.data = (String) obj;
 					
@@ -343,23 +349,31 @@ public class CatchMyMindServer extends JFrame {
 			return cm;
 		}
 		public void run() {
+			System.out.println("0");
 			while (true) { // 사용자 접속을 계속해서 받기 위해 while문
+				System.out.println("1");
 				ChatMsg cm = null; 
-				if (client_socket == null)
+				System.out.println("2");
+				if (client_socket == null) {
+					System.out.println("너니?");
 					break;
+				}
+				System.out.println("3");
 				cm = ReadChatMsg();
+				System.out.println(cm);
 				if (cm==null)
 					break;
 				if (cm.code.length()==0)
 					break;
 				AppendObject(cm);
 				if (cm.code.matches("100")) {
-					UserName = cm.UserName;
+					UserName = cm.userName;
 					UserStatus = "O"; // Online 상태
 					Login();
 					break;
-				} else if (cm.code.matches("200")) {
-					String msg = String.format("[%s] %s", cm.UserName, cm.data);
+				}
+				else if (cm.code.matches("200")) {
+					String msg = String.format("[%s] %s", cm.userName, cm.data);
 					AppendText(msg); // server 화면에 출력
 					String[] args = msg.split(" "); // 단어들을 분리한다.
 					if (args.length == 1) { // Enter key 만 들어온 경우 Wakeup 처리만 한다.
@@ -401,14 +415,19 @@ public class CatchMyMindServer extends JFrame {
 						//WriteAll(msg + "\n"); // Write All
 						WriteAllObject(cm);
 					}
-				} else if(cm.code.matches("300")) { // 방 생성
+				}
+				else if(cm.code.matches("300")) { // 방 생성
+					System.out.println(cm.roomName);
+					System.out.println(cm.roomNumofPeo);
+					System.out.print(roomId);
 					CreateRoom(cm.roomName, cm.roomNumofPeo, roomId++);
 					break;
 				}
-//				else if (cm.code.matches("400")) { // logout message 처리
-//					Logout();
-//					break;
-//				} else if (cm.code.matches("300")) {
+				else if (cm.code.matches("400")) { // logout message 처리
+					Logout();
+					break;
+				}
+//				else if (cm.code.matches("300")) {
 //					WriteAllObject(cm);
 //				}
 			} // while
