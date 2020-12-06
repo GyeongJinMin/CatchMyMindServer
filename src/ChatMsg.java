@@ -1,20 +1,21 @@
-
-// ChatMsg.java Ã¤ÆÃ ¸Ş½ÃÁö ObjectStream ¿ë.
+// ChatMsg.java ì±„íŒ… ë©”ì‹œì§€ ObjectStream ìš©.
 public class ChatMsg {
-    public String code;
-    public String userName;
-    public String data;
-    public byte[] imgbytes;
 
-    public String roomName; // ¹æÀÌ¸§
-    public String roomNumofPeo; // ÀÎ¿ø¼ö
+	private String code;
+    private String userName;
+    private String data;
+    private byte[] imgbytes;
 
-    public String roomId; // ¹æ¾ÆÀÌµğ
+    private String roomName; // ë°©ì´ë¦„
+    private String roomNumofPeo; // ì¸ì›ìˆ˜
 
-    public String quiz; // ¹®Á¦
+    private String roomId; // ë°©ì•„ì´ë””
 
-    public String itemName; // ItemÀÌ¸§
-    public String penColor; // Ææ »ö»ó
+    private String quiz; // ë¬¸ì œ
+
+    private String itemName; // Itemì´ë¦„
+    private String penColor; // íœ ìƒ‰ìƒ
+    private String penSize; // íœ, ì§€ìš°ê°œ ë‘ê»˜
 
     public ChatMsg() {}
 
@@ -28,31 +29,80 @@ public class ChatMsg {
         return code;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getRoomName() {
-        return roomName;
-    }
-
-    public String getRoomNumofPeo() {
-        return roomNumofPeo;
-    }
-
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getUserName() {
+        return userName;
     }
 
     public void setUserName(String userName) {
         this.userName = userName;
     }
 
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
     public void setRoomName(String roomName) {
         this.roomName = roomName;
+    }
+
+    public String getRoomNumofPeo() {
+        return roomNumofPeo;
     }
 
     public void setRoomNumofPeo(String roomNumofPeo) {
         this.roomNumofPeo = roomNumofPeo;
     }
+
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
+
+    public String getQuiz() {
+        return quiz;
+    }
+
+    public void setQuiz(String quiz) {
+        this.quiz = quiz;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public String getPenColor() {
+        return penColor;
+    }
+
+    public void setPenColor(String penColor) {
+        this.penColor = penColor;
+    }
+
+    public String getPenSize() {
+        return penSize;
+    }
+
+    public void setPenSize(String penSize) {
+        this.penSize = penSize;
+    }
+    
 }
