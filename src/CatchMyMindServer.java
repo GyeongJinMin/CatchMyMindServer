@@ -1,4 +1,4 @@
-// CatchMyMindServer.java objectStream ±â¹İ °ÔÀÓ Server
+// CatchMyMindServer.java objectStream ê¸°ë°˜ ê²Œì„ Server
 
 import java.awt.EventQueue;
 
@@ -34,11 +34,11 @@ public class CatchMyMindServer extends JFrame {
 	JTextArea textArea;
 	private JTextField txtPortNumber;
 
-	private ServerSocket socket; // ¼­¹ö¼ÒÄÏ
-	private Socket client_socket; // accept() ¿¡¼­ »ı¼ºµÈ client ¼ÒÄÏ
-	private Vector UserVec = new Vector(); // ¿¬°áµÈ »ç¿ëÀÚ¸¦ ÀúÀåÇÒ º¤ÅÍ
-	private Vector RoomVec = new Vector(); // »ı¼ºµÈ ¹æÀ» ÀúÀåÇÒ º¤ÅÍ
-	private static final int BUF_LEN = 128; // Windows Ã³·³ BUF_LEN À» Á¤ÀÇ
+	private ServerSocket socket; // ì„œë²„ì†Œì¼“
+	private Socket client_socket; // accept() ì—ì„œ ìƒì„±ëœ client ì†Œì¼“
+	private Vector UserVec = new Vector(); // ì—°ê²°ëœ ì‚¬ìš©ìë¥¼ ì €ì¥í•  ë²¡í„°
+	private Vector RoomVec = new Vector(); // ìƒì„±ëœ ë°©ì„ ì €ì¥í•  ë²¡í„°
+	private static final int BUF_LEN = 128; // Windows ì²˜ëŸ¼ BUF_LEN ì„ ì •ì˜
 
 	/**
 	 * Launch the application.
@@ -97,8 +97,8 @@ public class CatchMyMindServer extends JFrame {
 				}
 				AppendText("Game Server Running..");
 				btnServerStart.setText("Game Server Running..");
-				btnServerStart.setEnabled(false); // ¼­¹ö¸¦ ´õÀÌ»ó ½ÇÇà½ÃÅ°Áö ¸ø ÇÏ°Ô ¸·´Â´Ù
-				txtPortNumber.setEnabled(false); // ´õÀÌ»ó Æ÷Æ®¹øÈ£ ¼öÁ¤¸ø ÇÏ°Ô ¸·´Â´Ù
+				btnServerStart.setEnabled(false); // ì„œë²„ë¥¼ ë”ì´ìƒ ì‹¤í–‰ì‹œí‚¤ì§€ ëª» í•˜ê²Œ ë§‰ëŠ”ë‹¤.
+				txtPortNumber.setEnabled(false); // ë”ì´ìƒ í¬íŠ¸ë²ˆí˜¸ ìˆ˜ì • ëª» í•˜ê²Œ ë§‰ëŠ”ë‹¤.
 				AcceptServer accept_server = new AcceptServer();
 				accept_server.start();
 			}
@@ -107,44 +107,44 @@ public class CatchMyMindServer extends JFrame {
 		contentPane.add(btnServerStart);
 	}
 
-	// »õ·Î¿î Âü°¡ÀÚ accept() ÇÏ°í user thread¸¦ »õ·Î »ı¼ºÇÑ´Ù.
+	// ìƒˆë¡œìš´ ì°¸ê°€ì accept() í•˜ê³  user threadë¥¼ ìƒˆë¡œ ìƒì„±í•œë‹¤.
 	class AcceptServer extends Thread {
 		@SuppressWarnings("unchecked")
 		public void run() {
-			while (true) { // »ç¿ëÀÚ Á¢¼ÓÀ» °è¼ÓÇØ¼­ ¹Ş±â À§ÇØ while¹®
+			while (true) { // ì‚¬ìš©ì ì ‘ì†ì„ ê³„ì†í•´ì„œ ë°›ê¸° ìœ„í•´ whileë¬¸
 				try {
 					AppendText("Waiting new clients ...");
-					client_socket = socket.accept(); // accept°¡ ÀÏ¾î³ª±â Àü±îÁö´Â ¹«ÇÑ ´ë±âÁß
-					AppendText("»õ·Î¿î Âü°¡ÀÚ from " + client_socket);
-					// User ´ç ÇÏ³ª¾¿ Thread »ı¼º
+					client_socket = socket.accept(); // acceptê°€ ì¼ì–´ë‚˜ê¸° ì „ê¹Œì§€ëŠ” ë¬´í•œ ëŒ€ê¸°ì¤‘
+					AppendText("ìƒˆë¡œìš´ ì°¸ê°€ì from " + client_socket);
+					// User ë‹¹ í•˜ë‚˜ì”© Thread ìƒì„±
 					UserService new_user = new UserService(client_socket);
-					UserVec.add(new_user); // »õ·Î¿î Âü°¡ÀÚ ¹è¿­¿¡ Ãß°¡
-					new_user.start(); // ¸¸µç °´Ã¼ÀÇ ½º·¹µå ½ÇÇà
-					AppendText("ÇöÀç Âü°¡ÀÚ ¼ö " + UserVec.size());
+					UserVec.add(new_user); // ìƒˆë¡œìš´ ì°¸ê°€ì ë°°ì—´ì— ì¶”ê°€
+					new_user.start(); // ë§Œë“  ê°ì²´ì˜ ìŠ¤ë ˆë“œ ì‹¤í–‰
+					AppendText("í˜„ì¬ ì°¸ê°€ì ìˆ˜ " + UserVec.size());
 				} catch (IOException e) {
 					AppendText("accept() error");
-					//System.exit(0);
+					// System.exit(0);
 				}
 			}
 		}
 	}
 
 	public void AppendText(String str) {
-		// textArea.append("»ç¿ëÀÚ·ÎºÎÅÍ µé¾î¿Â ¸Ş¼¼Áö : " + str+"\n");
+		// textArea.append("ì‚¬ìš©ìë¡œë¶€í„° ë“¤ì–´ì˜¨ ë©”ì„¸ì§€ : " + str+"\n");
 		textArea.append(str + "\n");
 		textArea.setCaretPosition(textArea.getText().length());
 	}
 
 	public void AppendObject(ChatMsg msg) {
-		// textArea.append("»ç¿ëÀÚ·ÎºÎÅÍ µé¾î¿Â object : " + str+"\n");
-		textArea.append("code = " + msg.code + "\n");
-		textArea.append("id = " + msg.userName + "\n");
-		textArea.append("data = " + msg.data + "\n");
+		// textArea.append("ì‚¬ìš©ìë¡œë¶€í„° ë“¤ì–´ì˜¨ object : " + str+"\n");
+		textArea.append("code = " + msg.getCode() + "\n");
+		textArea.append("id = " + msg.getUserName() + "\n");
+		textArea.append("data = " + msg.getData() + "\n");
 		textArea.setCaretPosition(textArea.getText().length());
 	}
 
-	// User ´ç »ı¼ºµÇ´Â Thread
-	// Read One ¿¡¼­ ´ë±â -> Write All
+	// User ë‹¹ ìƒì„±ë˜ëŠ” Thread
+	// Read One ì—ì„œ ëŒ€ê¸° -> Write All
 	class UserService extends Thread {
 		private InputStream is;
 		private OutputStream os;
@@ -158,11 +158,11 @@ public class CatchMyMindServer extends JFrame {
 		private Vector user_vc;
 		public String UserName = "";
 		public String UserStatus;
-		public int roomId = 1;
+		private int roomId = 1;
 
 		public UserService(Socket client_socket) {
 			// TODO Auto-generated constructor stub
-			// ¸Å°³º¯¼ö·Î ³Ñ¾î¿Â ÀÚ·á ÀúÀå
+			// ë§¤ê°œë³€ìˆ˜ë¡œ ë„˜ì–´ì˜¨ ìë£Œ ì €ì¥
 			this.client_socket = client_socket;
 			this.user_vc = UserVec;
 			try {
@@ -175,38 +175,38 @@ public class CatchMyMindServer extends JFrame {
 		}
 
 		public void Login() {
-			AppendText("»õ·Î¿î Âü°¡ÀÚ " + UserName + " ÀÔÀå.");
-			WriteOne("login success"); // ¿¬°áµÈ »ç¿ëÀÚ¿¡°Ô Á¤»óÁ¢¼ÓÀ» ¾Ë¸²
-//			String msg = "[" + UserName + "]´ÔÀÌ ÀÔÀå ÇÏ¿´½À´Ï´Ù.\n";
-//			WriteOthers(msg); // ¾ÆÁ÷ user_vc¿¡ »õ·Î ÀÔÀåÇÑ user´Â Æ÷ÇÔµÇÁö ¾Ê¾Ò´Ù.
+			AppendText("ìƒˆë¡œìš´ ì°¸ê°€ì " + this + UserName + " ì…ì¥.");
+			WriteOne("login success"); // ì—°ê²°ëœ ì‚¬ìš©ìì—ê²Œ ì •ìƒì ‘ì†ì„ ì•Œë¦¼
+//			String msg = "[" + UserName + "]ë‹˜ì´ ì…ì¥í•˜ì˜€ìŠµë‹ˆë‹¤.\n";
+//			WriteOthers(msg); // ì•„ì§ user_vcì— ìƒˆë¡œ ì…ì¥í•œ userëŠ” í¬í•¨ë˜ì§€ ì•Šì•˜ë‹¤.
 		}
 
 		public void Logout() {
-			UserVec.removeElement(this); // LogoutÇÑ ÇöÀç °´Ã¼¸¦ º¤ÅÍ¿¡¼­ Áö¿î´Ù
-			WriteOne("logout success"); // ³ª¸¦ Á¦¿ÜÇÑ ´Ù¸¥ Userµé¿¡°Ô Àü¼Û
+			UserVec.removeElement(this); // Logoutí•œ í˜„ì¬ ê°ì²´ë¥¼ ë²¡í„°ì—ì„œ ì§€ìš´ë‹¤
+			WriteOne("logout success");
 			this.client_socket = null;
-			AppendText("»ç¿ëÀÚ " + "[" + UserName + "] ÅğÀå. ÇöÀç Âü°¡ÀÚ ¼ö " + UserVec.size());
+			AppendText("ì‚¬ìš©ì " + "[" + UserName + "] í‡´ì¥. í˜„ì¬ ì°¸ê°€ì ìˆ˜ " + UserVec.size());
 		}
-		
+
 		public void CreateRoom(String roomName, String roomNumofPeo, int roomId) {
-			System.out.println("¾ß");
-			AppendText("[" + UserName + "]´ÔÀÌ ¹æÀ» »ı¼ºÇÏ¿´½À´Ï´Ù.\n");
+			AppendText("[" + this + UserName + "]ë‹˜ì´ ë°©ì„ ìƒì„±í•˜ì˜€ìŠµë‹ˆë‹¤.\n");
 			String msg = "CreateRoom";
 			Room room = new Room(roomName, roomNumofPeo, Integer.toString(roomId));
 			RoomVec.addElement(room);
 			WriteOne(msg);
 		}
 
-		// ¸ğµç Userµé¿¡°Ô ¹æ¼Û. °¢°¢ÀÇ UserService ThreadÀÇ WriteONe() À» È£ÃâÇÑ´Ù.
-		public void WriteAll(String str) {
+		// ëª¨ë“  Userë“¤ì—ê²Œ ë°©ì†¡. ê°ê°ì˜ UserService Threadì˜ WriteONe() ì„ í˜¸ì¶œí•œë‹¤.
+		public synchronized void WriteAll(String str) {
 			for (int i = 0; i < user_vc.size(); i++) {
 				UserService user = (UserService) user_vc.elementAt(i);
 				if (user.UserStatus == "O")
 					user.WriteOne(str);
 			}
 		}
-		// ¸ğµç Userµé¿¡°Ô Object¸¦ ¹æ¼Û. Ã¤ÆÃ message¿Í image object¸¦ º¸³¾ ¼ö ÀÖ´Ù
-		public void WriteAllObject(ChatMsg obj) {
+
+		// ëª¨ë“  Userë“¤ì—ê²Œ Objectë¥¼ ë°©ì†¡. ì±„íŒ… messageì™€ image objectë¥¼ ë³´ë‚¼ ìˆ˜ ìˆë‹¤
+		public synchronized void WriteAllObject(ChatMsg obj) {
 			for (int i = 0; i < user_vc.size(); i++) {
 				UserService user = (UserService) user_vc.elementAt(i);
 				if (user.UserStatus == "O")
@@ -214,8 +214,8 @@ public class CatchMyMindServer extends JFrame {
 			}
 		}
 
-		// ³ª¸¦ Á¦¿ÜÇÑ Userµé¿¡°Ô ¹æ¼Û. °¢°¢ÀÇ UserService ThreadÀÇ WriteONe() À» È£ÃâÇÑ´Ù.
-		public void WriteOthers(String str) {
+		// ë‚˜ë¥¼ ì œì™¸í•œ Userë“¤ì—ê²Œ ë°©ì†¡. ê°ê°ì˜ UserService Threadì˜ WriteONe() ì„ í˜¸ì¶œí•œë‹¤.
+		public synchronized void WriteOthers(String str) {
 			for (int i = 0; i < user_vc.size(); i++) {
 				UserService user = (UserService) user_vc.elementAt(i);
 				if (user != this && user.UserStatus == "O")
@@ -223,8 +223,8 @@ public class CatchMyMindServer extends JFrame {
 			}
 		}
 
-		// Windows Ã³·³ message Á¦¿ÜÇÑ ³ª¸ÓÁö ºÎºĞÀº NULL ·Î ¸¸µé±â À§ÇÑ ÇÔ¼ö
-		public byte[] MakePacket(String msg) {
+		// Windows ì²˜ëŸ¼ message ì œì™¸í•œ ë‚˜ë¨¸ì§€ ë¶€ë¶„ì€ NULL ë¡œ ë§Œë“¤ê¸° ìœ„í•œ í•¨ìˆ˜
+		public synchronized byte[] MakePacket(String msg) {
 			byte[] packet = new byte[BUF_LEN];
 			byte[] bb = null;
 			int i;
@@ -241,93 +241,88 @@ public class CatchMyMindServer extends JFrame {
 			return packet;
 		}
 
-		// UserService Thread°¡ ´ã´çÇÏ´Â Client ¿¡°Ô 1:1 Àü¼Û
-		public void WriteOne(String msg) {
-			if(msg.equals("login success")) {
-				ChatMsg obcm = new ChatMsg("SERVER", "100", msg); // 101 ? 
+		// UserService Threadê°€ ë‹´ë‹¹í•˜ëŠ” Client ì—ê²Œ 1:1 ì „ì†¡
+		public synchronized void WriteOne(String msg) {
+			if (msg.equals("login success")) {
+				ChatMsg obcm = new ChatMsg("SERVER", "100", msg); // 101 ?
 				WriteChatMsg(obcm);
-			}
-			else if(msg.equals("CreateRoom")) {
+			} else if (msg.equals("CreateRoom")) {
 				System.out.println(msg);
 				ChatMsg obcm = new ChatMsg();
-				obcm.code = "300";
-				obcm.roomId = Integer.toString(roomId);
+				obcm.setCode("300");
+				obcm.setRoomId(Integer.toString(roomId));
 				WriteChatMsg(obcm);
-			}
-			else if(msg.equals("logout success")) {
+			} else if (msg.equals("logout success")) {
 				ChatMsg obcm = new ChatMsg("SERVER", "400", msg);
 				WriteChatMsg(obcm);
-			}
-			else {
+			} else {
 				ChatMsg obcm = new ChatMsg("SERVER", "200", msg);
 				WriteChatMsg(obcm);
 			}
 		}
 
-		// ±Ó¼Ó¸» Àü¼Û
-		public void WritePrivate(String msg) {
-			ChatMsg obcm = new ChatMsg("±Ó¼Ó¸»", "200", msg);
+		// ê·“ì†ë§ ì „ì†¡
+		public synchronized void WritePrivate(String msg) {
+			ChatMsg obcm = new ChatMsg("ê·“ì†ë§", "200", msg);
 			WriteChatMsg(obcm);
 		}
+
 		//
-		public void WriteChatMsg(ChatMsg obj) {
+		public synchronized void WriteChatMsg(ChatMsg obj) {
 			try {
-				if(obj.code.equals("300")) {
-					System.out.println(obj.code);
-					oos.writeObject(obj.code);
-					oos.writeObject(obj.roomId);
+				if (obj.getCode().equals("300")) {
+					System.out.println(obj.getCode());
+					oos.writeObject(obj.getCode());
+					oos.writeObject(obj.getRoomId());
+				} else {
+					oos.writeObject(obj.getCode());
+					oos.writeObject(obj.getUserName());
+					oos.writeObject(obj.getData());
+//				    if (obj.getCcode.equals("300")) {
+//					    oos.writeObject(obj.imgbytes);
+//					    //oos.writeObject(obj.bimg);
+//				    }
 				}
-				else {
-					oos.writeObject(obj.code);
-				    oos.writeObject(obj.userName);
-				    oos.writeObject(obj.data);
-				    if (obj.code.equals("300")) {
-					    oos.writeObject(obj.imgbytes);
-					    //oos.writeObject(obj.bimg);
-				    }
-				}
-			} 
-			catch (IOException e) {
-				AppendText("oos.writeObject(ob) error");		
+			} catch (IOException e) {
+				AppendText("oos.writeObject(ob) error");
 				try {
 					ois.close();
 					oos.close();
 					client_socket.close();
 					client_socket = null;
 					ois = null;
-					oos = null;				
+					oos = null;
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				Logout();
-			
+
 			}
 		}
-		
-		public ChatMsg ReadChatMsg() {
+
+		public synchronized ChatMsg ReadChatMsg() {
 			Object obj = null;
 			String msg = null;
 			ChatMsg cm = new ChatMsg("", "", "");
-			// Android¿Í È£È¯¼ºÀ» À§ÇØ °¢°¢ÀÇ Field¸¦ µû·Îµû·Î ÀĞ´Â´Ù.
+			// Androidì™€ í˜¸í™˜ì„±ì„ ìœ„í•´ ê°ê°ì˜ Fieldë¥¼ ë”°ë¡œë”°ë¡œ ì½ëŠ”ë‹¤.
 			try {
 				obj = ois.readObject();
-				cm.code = (String) obj;
-				AppendText("code: "+ cm.code);
-				if(cm.code.equals("300")) {
+				cm.setCode((String) obj);
+				AppendText("code: " + cm.getCode());
+				if (cm.getCode().equals("300")) {
 					obj = ois.readObject();
-					cm.userName = (String) obj;
+					cm.setUserName((String) obj);
 					obj = ois.readObject();
-					cm.roomName = (String) obj;
+					cm.setRoomName((String) obj);
 					obj = ois.readObject();
-					cm.roomNumofPeo = (String) obj;
-				}
-				else {
+					cm.setRoomNumofPeo((String) obj);
+				} else {
 					obj = ois.readObject();
-					cm.userName = (String) obj;
+					cm.setUserName((String) obj);
 					obj = ois.readObject();
-					cm.data = (String) obj;
-					
+					cm.setData((String) obj);
+
 //					if (cm.code.equals("300")) {
 //						obj = ois.readObject();
 //						cm.imgbytes = (byte[]) obj;
@@ -348,35 +343,33 @@ public class CatchMyMindServer extends JFrame {
 			}
 			return cm;
 		}
+
 		public void run() {
-			System.out.println("0");
-			while (true) { // »ç¿ëÀÚ Á¢¼ÓÀ» °è¼ÓÇØ¼­ ¹Ş±â À§ÇØ while¹®
-				System.out.println("1");
-				ChatMsg cm = null; 
-				System.out.println("2");
-				if (client_socket == null) {
-					System.out.println("³Ê´Ï?");
+			while (true) { // ì‚¬ìš©ì ì ‘ì†ì„ ê³„ì†í•´ì„œ ë°›ê¸° ìœ„í•´ whileë¬¸
+
+				ChatMsg cm = null;
+				if (client_socket == null)
+					break;
+				cm = ReadChatMsg();
+				if (cm == null) {
 					break;
 				}
-				System.out.println("3");
-				cm = ReadChatMsg();
-				System.out.println(cm);
-				if (cm==null)
-					break;
-				if (cm.code.length()==0)
+				System.out.println(cm.getCode());
+				System.out.println(cm.getUserName());
+				System.out.println(cm.getData());
+				if (cm.getCode().length() == 0)
 					break;
 				AppendObject(cm);
-				if (cm.code.matches("100")) {
-					UserName = cm.userName;
-					UserStatus = "O"; // Online »óÅÂ
+				if (cm.getCode().matches("100")) {
+					UserName = cm.getUserName();
+					UserStatus = "O"; // Online ìƒíƒœ
 					Login();
-					break;
-				}
-				else if (cm.code.matches("200")) {
-					String msg = String.format("[%s] %s", cm.userName, cm.data);
-					AppendText(msg); // server È­¸é¿¡ Ãâ·Â
-					String[] args = msg.split(" "); // ´Ü¾îµéÀ» ºĞ¸®ÇÑ´Ù.
-					if (args.length == 1) { // Enter key ¸¸ µé¾î¿Â °æ¿ì Wakeup Ã³¸®¸¸ ÇÑ´Ù.
+//					break;
+				} else if (cm.getCode().matches("200")) {
+					String msg = String.format("[%s] %s", cm.getUserName(), cm.getData());
+					AppendText(msg); // server í™”ë©´ì— ì¶œë ¥
+					String[] args = msg.split(" "); // ë‹¨ì–´ë“¤ì„ ë¶„ë¦¬í•œë‹¤.
+					if (args.length == 1) { // Enter key ë§Œ ë“¤ì–´ì˜¨ ê²½ìš° Wakeup ì²˜ë¦¬ë§Œ í•œë‹¤.
 						UserStatus = "O";
 					} else if (args[1].matches("/exit")) {
 						Logout();
@@ -394,36 +387,37 @@ public class CatchMyMindServer extends JFrame {
 						UserStatus = "S";
 					} else if (args[1].matches("/wakeup")) {
 						UserStatus = "O";
-					} else if (args[1].matches("/to")) { // ±Ó¼Ó¸»
+					} else if (args[1].matches("/to")) { // ê·“ì†ë§
 						for (int i = 0; i < user_vc.size(); i++) {
 							UserService user = (UserService) user_vc.elementAt(i);
 							if (user.UserName.matches(args[2]) && user.UserStatus.matches("O")) {
 								String msg2 = "";
-								for (int j = 3; j < args.length; j++) {// ½ÇÁ¦ message ºÎºĞ
+								for (int j = 3; j < args.length; j++) {// ì‹¤ì œ message ë¶€ë¶„
 									msg2 += args[j];
 									if (j < args.length - 1)
 										msg2 += " ";
 								}
-								// /to »©°í.. [±Ó¼Ó¸»] [user1] Hello user2..
+								// /to ë¹¼ê³ .. [ê·“ì†ë§] [user1] Hello user2..
 								user.WritePrivate(args[0] + " " + msg2 + "\n");
-								//user.WriteOne("[±Ó¼Ó¸»] " + args[0] + " " + msg2 + "\n");
+								// user.WriteOne("[ê·“ì†ë§] " + args[0] + " " + msg2 + "\n");
 								break;
 							}
 						}
-					} else { // ÀÏ¹İ Ã¤ÆÃ ¸Ş½ÃÁö
+					} else { // ì¼ë°˜ ì±„íŒ… ë©”ì‹œì§€
 						UserStatus = "O";
-						//WriteAll(msg + "\n"); // Write All
+						// WriteAll(msg + "\n"); // Write All
 						WriteAllObject(cm);
 					}
-				}
-				else if(cm.code.matches("300")) { // ¹æ »ı¼º
-					System.out.println(cm.roomName);
-					System.out.println(cm.roomNumofPeo);
+				} else if (cm.getCode().matches("300")) { // ë°© ìƒì„±
+					System.out.println(cm.getRoomName());
+					System.out.println(cm.getRoomNumofPeo());
 					System.out.print(roomId);
-					CreateRoom(cm.roomName, cm.roomNumofPeo, roomId++);
-					break;
-				}
-				else if (cm.code.matches("400")) { // logout message Ã³¸®
+					CreateRoom(cm.getRoomName(), cm.getRoomNumofPeo(), roomId);
+//					break;
+				} else if (cm.getCode().matches("400")) { // logout message ì²˜ë¦¬
+					System.out.println(cm.getCode());
+					System.out.println(cm.getUserName());
+					System.out.println(cm.getData());
 					Logout();
 					break;
 				}
