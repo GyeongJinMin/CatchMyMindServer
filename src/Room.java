@@ -1,14 +1,24 @@
-
 public class Room {
 
-	private String roomName;
-    private String roomNumofPeo;
-    private String roomId;
+    private String presenter; // 출제자
+    private String roomName; // 방이름
+    private String maxNumofPeo; // 최대 인원수
+    private String roomNumofPeo; // 인원수
+    private String roomId; // 방아이디
 
-    public Room(String roomName, String roomNumofPeo, String roomId) {
+    public Room(String presenter, String roomName, String maxNumofPeo, String roomId) {
+        this.presenter = presenter;
         this.roomName = roomName;
-        this.roomNumofPeo = roomNumofPeo;
+        this.maxNumofPeo = maxNumofPeo;
         this.roomId = roomId;
+    }
+
+    public String getPresenter() {
+        return presenter;
+    }
+
+    public void setPresenter(String presenter) {
+        this.presenter = presenter;
     }
 
     public String getRoomName() {
@@ -19,13 +29,13 @@ public class Room {
         this.roomName = roomName;
     }
 
-    public String getRoomNumofPeo() {
-        return roomNumofPeo;
-    }
+    public String getMaxNumofPeo() { return maxNumofPeo; }
 
-    public void setRoomNumofPeo(String roomNumofPeo) {
-        this.roomNumofPeo = roomNumofPeo;
-    }
+    public void setMaxNumofPeo(String maxNumofPeo) { this.maxNumofPeo = maxNumofPeo; }
+
+    public String getRoomNumofPeo() { return roomNumofPeo; }
+
+    public void setRoomNumofPeo(String roomNumofPeo) { this.roomNumofPeo = roomNumofPeo; }
 
     public String getRoomId() {
         return roomId;
@@ -34,5 +44,5 @@ public class Room {
     public void setRoomId(String roomId) {
         this.roomId = roomId;
     }
-    
+
 }
