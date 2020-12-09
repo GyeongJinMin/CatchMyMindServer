@@ -562,13 +562,6 @@ public class CatchMyMindServer extends JFrame {
                cm.setUserName((String) obj);
                obj = ois.readObject();
                cm.setData((String) obj);
-
-//               if (cm.code.equals("300")) {
-//                  obj = ois.readObject();
-//                  cm.imgbytes = (byte[]) obj;
-//                  //obj = ois.readObject();
-//                  //cm.bimg = (BufferedImage) obj;
-//               }
             }
          } catch (ClassNotFoundException e) {
             // TODO Auto-generated catch block
@@ -663,12 +656,19 @@ public class CatchMyMindServer extends JFrame {
             } else if (cm.getCode().matches("500")) {
             	System.out.println("GameStart roomId : " + cm.getRoomId());
             	GameStart(cm.getRoomId());
-            } else if (cm.getCode().matches("700")) { // 방 새로고침
-               WriteOne(cm.getData());
+            } else if (cm.getCode().matches("601")) { // 단어 변경
+                if (cm.getData().equals("edit"))
+                    EditWord(cm.getRoomId(), cm.getQuiz());
+                 //else
+                    //RandomWord(cm.getRoomId());
+              } else if (cm.getCode().matches("602")) { // 펜 색상 변경
+                 System.out.println("SetPen : RoomId" + cm.getRoomId());
+                 SetPen(cm.getRoomId(), cm.getPenColor(), cm.getPenSize());
+              } else if (cm.getCode().matches("603")) { // 방 퇴장
+                 ClearCanvas(cm.getRoomId());
+              } else if (cm.getCode().matches("700")) { // 방 새로고침
+            	  WriteOne(cm.getData());
             }
-//            else if (cm.code.matches("300")) {
-//               WriteAllObject(cm);
-//            }
          } // while
       } // run
 	}
