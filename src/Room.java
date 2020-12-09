@@ -8,6 +8,8 @@ public class Room {
     private String roomNumofPeo; // 인원수
     private String roomId; // 방아이디
     private ArrayList<String> users;
+    private String quiz;
+    private int gameStatus;
 
     public Room() {
         users = new ArrayList<>();
@@ -68,4 +70,13 @@ public class Room {
     public void deleteUser(String userName) {
     	users.remove(userName);
     }
+    
+    public void setQuiz(String quiz) {
+        this.quiz = quiz;
+     }
+     
+     public String getQuiz() {
+        return this.quiz;
+     }
+
 }
