@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Room {
 
     private String presenter; // 출제자
@@ -5,12 +7,18 @@ public class Room {
     private String maxNumofPeo; // 최대 인원수
     private String roomNumofPeo; // 인원수
     private String roomId; // 방아이디
+    private ArrayList<String> users;
+
+    public Room() {
+        users = new ArrayList<>();
+    }
 
     public Room(String presenter, String roomName, String maxNumofPeo, String roomId) {
         this.presenter = presenter;
         this.roomName = roomName;
         this.maxNumofPeo = maxNumofPeo;
         this.roomId = roomId;
+        users = new ArrayList<>();
     }
 
     public String getPresenter() {
@@ -45,4 +53,19 @@ public class Room {
         this.roomId = roomId;
     }
 
+    public ArrayList<String> getUsers() {
+        return users;
+    }
+
+    public void setUsers(ArrayList<String> users) {
+        this.users = users;
+    }
+
+    public void addUser(String userName) {
+        users.add(userName);
+    }
+    
+    public void deleteUser(String userName) {
+    	users.remove(userName);
+    }
 }

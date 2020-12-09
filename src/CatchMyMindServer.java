@@ -39,7 +39,7 @@ public class CatchMyMindServer extends JFrame {
 	private Socket client_socket; // accept() 에서 생성된 client 소켓
 	private String users[] = {"경진", "수연", "user0", "user1", "user2", "user3","user4", "user5", "user6", "user7", "user8", "user9"};
 	private Vector UserVec = new Vector(); // 연결된 사용자를 저장할 벡터
-	private Vector RoomVec = new Vector(); // 생성된 방을 저장할 벡터
+	private ArrayList<Room> roomList; // 생성된 방을 저장할 리스트
 	private static final int BUF_LEN = 128; // Windows 처럼 BUF_LEN 을 정의
 	private int roomId = 1;
 
@@ -116,11 +116,13 @@ public class CatchMyMindServer extends JFrame {
 		public void run() {
 			while (true) { // 사용자 접속을 계속해서 받기 위해 while문
 				try {
+					// 임시로 방 생성
+					roomList = new ArrayList<>();
 					int num[] = {2, 4, 8, 4};
 			        for (int i = 0; i < 4; i++) {
 			        	Room room = new Room("경진", String.format("Room %d", i + 1), num[i]+"명", Integer.toString(roomId++));
 			        	room.setRoomNumofPeo(Integer.toString(0));
-			            RoomVec.addElement(room);
+			            roomList.add(room);
 			        }
 					AppendText("Waiting new clients ...");
 					client_socket = socket.accept(); // accept가 일어나기 전까지는 무한 대기중
@@ -201,34 +203,72 @@ public class CatchMyMindServer extends JFrame {
 			String msg = "CreateRoom";
 			Room room = new Room(UserName, roomName, maxNumofPeo, Integer.toString(roomId));
 			room.setRoomNumofPeo(Integer.toString(0));
-			RoomVec.addElement(room);
+			roomList.add(room);
 			WriteOne(msg);
 		}
 		
 		public void EnterRoom(String roomId) {
-			// room_vc에서 roomID 찾아서 들어가기
-			for(int i=0; i<RoomVec.size(); i++) {
-				Room room = (Room) RoomVec.get(i);
+			// roomList에서 roomID 찾아서 들어가기
+			for(int i=0; i<roomList.size(); i++) {
+				Room room = roomList.get(i);
 				if(room.getRoomId().equals(roomId)) { // 방아이디가 roomId의
-					int roomNumofPeo = Integer.parseInt(room.getRoomNumofPeo().substring(0, 1)); // null
-					int maxNumofPeo = Integer.parseInt(room.getMaxNumofPeo().substring(0, 1)); //  null
+					int roomNumofPeo = Integer.parseInt(room.getRoomNumofPeo().substring(0, 1));
+					int maxNumofPeo = Integer.parseInt(room.getMaxNumofPeo().substring(0, 1));
 					if(roomNumofPeo < maxNumofPeo) { // 현재 인원수가 최대 인원수보다 작으면
 						AppendText("[" + this + UserName + "]님이 방에 입장하였습니다.\n");
 						String msg = "[" + UserName + "]님이 방에 입장하였습니다.\n";
 						room.setRoomNumofPeo(Integer.toString(roomNumofPeo+1));
+						room.addUser(UserName);
 						UserStatus = "R" + roomId;
 						WriteOne("EnterRoom");
-						WriteAll(msg);
+						WriteRoomAll(msg);
 					}
-					else {
+					else { // 이미 인원수가 꽉 찬 방일 때
 						WriteOne("EnterRoom Failed");
 					}
 					System.out.println("roomNumofPeo : " + roomNumofPeo);
 					System.out.println("maxNumofPeo : " + maxNumofPeo);
 				}
 			}
-			if(UserStatus == "O") {
+			if(UserStatus == "O") { // roomList에 roomId가 없을 때
 				WriteOne("EnterRoom Failed");
+			}
+		}
+		
+		public void ExitRoom(String roomId) {
+			// roomList에서 roomID 찾아서 나오기
+			System.out.println("ExitRoom");
+			for(int i=0; i<roomList.size(); i++) {	
+				Room room = roomList.get(i);
+				System.out.println("room.getRoomId:"+room.getRoomId()+ "," + "roomId:" + roomId);
+				if(room.getRoomId().equals(roomId)) { // 방아이디가 roomId일때
+					int roomNumofPeo = Integer.parseInt(room.getRoomNumofPeo().substring(0, 1));
+					AppendText("[" + this + UserName + "]님이 방에서 퇴장하였습니다.\n");
+					String msg = "[" + UserName + "]님이 방에서 퇴장하였습니다.\n";									
+					room.setRoomNumofPeo(Integer.toString(roomNumofPeo-1));
+					room.deleteUser(UserName);
+					WriteOne("ExitRoom");
+					WriteRoomOthers(msg);
+					UserStatus = "O";
+				}
+			}
+		}
+		
+		// 같은 방에 속해있는 모든 User들에게 방송
+		public synchronized void WriteRoomAll(String str) {
+			for (int i = 0; i < user_vc.size(); i++) {
+				UserService user = (UserService) user_vc.elementAt(i);
+				if (user.UserStatus.equals(UserStatus))
+					user.WriteOne(str);
+			}
+		}
+		
+		// 같은 방에 속해있는 나를 제외한 User들에게 방송. 각각의 UserService Thread의 WriteONe() 을 호출한다.
+		public synchronized void WriteRoomOthers(String str) {
+			for (int i = 0; i < user_vc.size(); i++) {
+				UserService user = (UserService) user_vc.elementAt(i);
+				if (user != this && user.UserStatus.equals(UserStatus))
+					user.WriteOne(str);
 			}
 		}
 
@@ -236,7 +276,7 @@ public class CatchMyMindServer extends JFrame {
 		public synchronized void WriteAll(String str) {
 			for (int i = 0; i < user_vc.size(); i++) {
 				UserService user = (UserService) user_vc.elementAt(i);
-				if (user.UserStatus.equals(UserStatus))
+				if (user.UserStatus == "O"|| user.UserStatus.charAt(0) == 'R')
 					user.WriteOne(str);
 			}
 		}
@@ -292,14 +332,27 @@ public class CatchMyMindServer extends JFrame {
 				System.out.println(msg);
 				ChatMsg obcm = new ChatMsg();
 				obcm.setCode("303");
+				obcm.setRoomId(Integer.toString(roomId));
 				WriteChatMsg(obcm);
 			} else if(msg.equals("EnterRoom Failed")) {
 				System.out.println(msg);
 				ChatMsg obcm = new ChatMsg();
 				obcm.setCode("304");
+				obcm.setRoomId(Integer.toString(roomId));
+				WriteChatMsg(obcm);
+			} else if(msg.equals("ExitRoom")) {
+				System.out.println(msg);
+				ChatMsg obcm = new ChatMsg();
+				obcm.setCode("302");
+				obcm.setRoomId(Integer.toString(roomId));
 				WriteChatMsg(obcm);
 			} else if (msg.equals("logout success")) {
 				ChatMsg obcm = new ChatMsg("SERVER", "400", msg);
+				WriteChatMsg(obcm);
+			} else if (msg.equals("Refresh")) {
+				System.out.println(msg);
+				ChatMsg obcm = new ChatMsg("SERVER", "700", msg);
+				obcm.setRoomList(roomList);
 				WriteChatMsg(obcm);
 			} else {
 				ChatMsg obcm = new ChatMsg("SERVER", "200", msg);
@@ -323,11 +376,22 @@ public class CatchMyMindServer extends JFrame {
 				} else if (obj.getCode().equals("303")||obj.getCode().equals("304")) {
 					System.out.println(obj.getCode());
 					oos.writeObject(obj.getCode());
+					oos.writeObject(obj.getRoomId());
 				} else {
-				
 					oos.writeObject(obj.getCode());
 					oos.writeObject(obj.getUserName());
 					oos.writeObject(obj.getData());
+					
+					if (obj.getCode().equals("700")) {
+						oos.writeObject(obj.getRoomList().size());
+						for(int i=0; i<obj.getRoomList().size(); i++) {
+							oos.writeObject(obj.getRoomList().get(i).getPresenter());
+							oos.writeObject(obj.getRoomList().get(i).getRoomName());
+							oos.writeObject(obj.getRoomList().get(i).getMaxNumofPeo());
+							oos.writeObject(obj.getRoomList().get(i).getRoomId());
+						}
+					}
+					
 //				    if (obj.getCcode.equals("300")) {
 //					    oos.writeObject(obj.imgbytes);
 //					    //oos.writeObject(obj.bimg);
@@ -365,7 +429,8 @@ public class CatchMyMindServer extends JFrame {
 					cm.setRoomName((String) obj);
 					obj = ois.readObject();
 					cm.setMaxNumofPeo((String) obj);
-				} else if(cm.getCode().equals("301")) {
+				}
+				else if(cm.getCode().equals("301")||cm.getCode().equals("302")) {
 					obj = ois.readObject();
 					cm.setRoomId((String) obj);
 				}
@@ -461,6 +526,8 @@ public class CatchMyMindServer extends JFrame {
 					CreateRoom(cm.getRoomName(), cm.getMaxNumofPeo(), roomId);
 				} else if (cm.getCode().matches("301")) { // 방 입장
 					EnterRoom(cm.getRoomId());
+				} else if (cm.getCode().matches("302")) { // 방 퇴장
+					ExitRoom(cm.getRoomId());
 				}
 				
 				else if (cm.getCode().matches("400")) { // logout message 처리
@@ -469,6 +536,9 @@ public class CatchMyMindServer extends JFrame {
 					System.out.println(cm.getData());
 					Logout();
 					break;
+				}
+				else if (cm.getCode().matches("700")) { // 방 새로고침
+					WriteOne(cm.getData());
 				}
 //				else if (cm.code.matches("300")) {
 //					WriteAllObject(cm);
